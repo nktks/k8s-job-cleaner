@@ -74,7 +74,7 @@ func Test_JobCleaner_Delete(t *testing.T) {
 						Status: v1.JobStatus{
 							Conditions: []v1.JobCondition{v1.JobCondition{
 								Type:          v1.JobComplete,
-								LastProbeTime: metav1.Time{time.Now().Add(-10 * time.Second)},
+								LastProbeTime: metav1.Time{Time: time.Now().Add(-10 * time.Second)},
 							}},
 						},
 					},
@@ -96,7 +96,7 @@ func Test_JobCleaner_Delete(t *testing.T) {
 						Status: v1.JobStatus{
 							Conditions: []v1.JobCondition{v1.JobCondition{
 								Type:          v1.JobComplete,
-								LastProbeTime: metav1.Time{time.Now()},
+								LastProbeTime: metav1.Time{Time: time.Now()},
 							}},
 						},
 					},

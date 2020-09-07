@@ -29,7 +29,6 @@ func (j *JobCleaner) Watch(ctx context.Context) error {
 		}
 		time.Sleep(5 * time.Second)
 	}
-	return nil
 }
 
 func (j *JobCleaner) Delete(ctx context.Context) error {
