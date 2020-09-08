@@ -32,6 +32,8 @@ rules:
   - delete
 ```
 If you use In-Cluster service account, you need to create ServiceAccount `name: default` to target namespace.
+see https://github.com/kubernetes/client-go/tree/master/examples/in-cluster-client-configuration https://github.com/kubernetes/client-go/tree/master/examples/out-of-cluster-client-configuration
+
 
 # how to test in minikube
 ```
