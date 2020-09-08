@@ -1,0 +1,101 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    name: test-k8s-job-cleaner
+  name: test-k8s-job-cleaner
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  managedFields:
+  - apiVersion: rbac.authorization.k8s.io/v1beta1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:roleRef:
+        f:apiGroup: {}
+        f:kind: {}
+        f:name: {}
+      f:subjects: {}
+    manager: kubectl
+    operation: Update
+  name: test-k8s-job-cleaner-admin
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: admin
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: test-k8s-job-cleaner
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: test-job-complete
+  namespace: test-k8s-job-cleaner
+spec:
+  backoffLimit: 1
+  parallelism: 1
+  completions: 1
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: test-k8s-job-cleaner
+          image: alpine
+          imagePullPolicy: IfNotPresent
+          command:
+            - sh
+          args:
+            - "-c"
+            - |
+              exit 0
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: test-job-fail
+  namespace: test-k8s-job-cleaner
+spec:
+  backoffLimit: 1
+  parallelism: 1
+  completions: 1
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: test-k8s-job-cleaner
+          image: alpine
+          imagePullPolicy: IfNotPresent
+          command:
+            - sh
+          args:
+            - "-c"
+            - |
+              exit 1
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: k8s-job-cleaner
+  namespace: test-k8s-job-cleaner
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: k8s-job-cleaner
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: k8s-job-cleaner
+    spec:
+      containers:
+        - image: ghcr.io/nakatamixi/k8s-job-cleaner:sha-c462173
+          command: ["./app", "--namespace", "test-k8s-job-cleaner", "-ttl", "0"]
+          imagePullPolicy: Always
+          name: k8s-job-cleaner
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
